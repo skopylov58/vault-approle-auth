@@ -20,7 +20,7 @@ public class App {
     public static String ROLE_ID = "role_id";
     public static String SECRET_ID = "secret_id";
 
-    public static String wrappedToken = "vault_root_token";
+    public static String wrappedToken = "<put_wrapped_token_here>";
 
     public static void main(String[] args) throws VaultException {
 

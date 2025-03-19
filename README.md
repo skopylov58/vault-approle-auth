@@ -1,6 +1,16 @@
 # vault-approle-auth
 Vault AppRole Authorization Example
 
+## Назначение программы
+Это пример интеграции с Vault на Java по AppRole с использованием
+библиотеки 'io.github.jopenlibs:vault-java-driver:6.2.0'
+
+Программа
+- получает wrapped token сгенерированный из role_id, secret_id
+- обменивает (un-wrap) токен на role_id, secret_id
+- делает login по role_id, secret_id
+- читает секрет из KV хранилища Vault
+
 ## Тестирование интеграции с Vault в локальном режиме
 
 Запустить сервер в dev моде
