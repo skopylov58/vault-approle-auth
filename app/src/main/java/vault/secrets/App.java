@@ -13,6 +13,7 @@ import io.github.jopenlibs.vault.response.AuthResponse;
 import io.github.jopenlibs.vault.response.LogicalResponse;
 import io.github.jopenlibs.vault.response.UnwrapResponse;
 
+
 import java.util.Map;
 
 public class App {
@@ -20,14 +21,13 @@ public class App {
     public static String ROLE_ID = "role_id";
     public static String SECRET_ID = "secret_id";
 
-    public static String wrappedToken = "<put_wrapped_token_here>";
+    public static String wrappedToken = "put_wrapped_token_here";
+
+    public static String vaultUrl = "http://127.0.0.1:8200";
 
     public static void main(String[] args) throws VaultException {
-
-        Vault vault = getVault("http://127.0.0.1:8200");
-        String clientToken = login(vault, wrappedToken);
-
-        String password = read(vault, "secret/my-role/jdbc", "password");
+        Vault vault = login(vaultUrl, wrappedToken);
+        String password = read(vault, "/sca-dev/sca", "snr-conf");
         System.out.println(password);
     }
 
@@ -35,13 +35,15 @@ public class App {
      * Get a Vault client.
      *
      * @param vaultUrl vault url
+     * @param token vault token
      * @return vault client
      * @throws VaultException
      */
-    public static Vault getVault(String vaultUrl) throws VaultException {
+    private static Vault getVault(String vaultUrl, String token) throws VaultException {
         final VaultConfig config =
                 new VaultConfig()
                         .address(vaultUrl)
+                        .token(token)
                         .sslConfig(new SslConfig().build())
                         .build();
         return Vault.create(config);
@@ -49,14 +51,15 @@ public class App {
 
     /**
      * Log in to Vault using the wrapped token.
-     *
-     * @param vault        vault
+     * @param vaultUrl Vault URL
      * @param wrappedToken wrapped token
-     * @return client token
+     * @return initialized vault client
      * @throws VaultException
      */
-    public static String login(Vault vault, String wrappedToken) throws VaultException {
-        UnwrapResponse unwrapped = vault.sys().wrapping().unwrap(wrappedToken);
+    public static Vault login(String vaultUrl, String wrappedToken) throws VaultException {
+
+        Vault vault = getVault(vaultUrl, wrappedToken);
+        UnwrapResponse unwrapped = vault.sys().wrapping().unwrap();
         JsonObject json = unwrapped.getData();
 
         JsonValue jsonRole = json.get(ROLE_ID);
@@ -72,7 +75,9 @@ public class App {
         String secret = jsonSecret.asString();
 
         AuthResponse authResponse = vault.auth().loginByAppRole(role, secret);
-        return authResponse.getAuthClientToken();
+        String clientToken = authResponse.getAuthClientToken();
+
+        return getVault(vaultUrl, clientToken);
     }
 
     /**
@@ -88,7 +93,8 @@ public class App {
         LogicalResponse response = vault.logical().read(path);
         int status = response.getRestResponse().getStatus();
         if (status != 200) {
-            String msg = "Vault read by path '%s' failed with status code '%d'".formatted(path, status);
+            byte[] body = response.getRestResponse().getBody();
+            String msg = "Vault read by path '%s' failed with status code '%d' '%s'".formatted(path, status, new String(body));
             throw new VaultException(msg);
         }
         Map<String, String> data = response.getData();

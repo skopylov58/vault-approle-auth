@@ -20,7 +20,7 @@ vault server -dev
 
 Подготовить запуск  CLI
 ```
-export VAULT_ADDRESS="http://127.0.0.1:8200"
+export VAULT_ADDR="http://127.0.0.1:8200"
 export VAULT_TOKEH=<root token>
 ```
 
