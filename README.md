@@ -8,8 +8,8 @@ Vault AppRole Authorization Example
 Программа
 - получает wrapped token сгенерированный из role_id, secret_id
 - обменивает (un-wrap) токен на role_id, secret_id
-- делает login по role_id, secret_id
-- читает секрет из KV хранилища Vault
+- делает login по role_id, secret_id и получает сессионный токен
+- читает секрет из KV хранилища Vault используя сессионный токен 
 
 ## Тестирование интеграции с Vault в локальном режиме
 

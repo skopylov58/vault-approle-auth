@@ -37,7 +37,7 @@ public class App {
      * @param vaultUrl vault url
      * @param token vault token
      * @return vault client
-     * @throws VaultException
+     * @throws VaultException if error happens
      */
     private static Vault getVault(String vaultUrl, String token) throws VaultException {
         final VaultConfig config =
@@ -54,7 +54,7 @@ public class App {
      * @param vaultUrl Vault URL
      * @param wrappedToken wrapped token
      * @return initialized vault client
-     * @throws VaultException
+     * @throws VaultException if error happens
      */
     public static Vault login(String vaultUrl, String wrappedToken) throws VaultException {
 
@@ -87,7 +87,7 @@ public class App {
      * @param path  path to the Vault secret
      * @param key   key in the secret
      * @return value corresponding to the key
-     * @throws VaultException
+     * @throws VaultException if error happens
      */
     public static String read(Vault vault, String path, String key) throws VaultException {
         LogicalResponse response = vault.logical().read(path);
